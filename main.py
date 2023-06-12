@@ -36,7 +36,7 @@ while cap.isOpened():
     if frame_count % frame_interval == 0:
         cv.imshow('Video', frame)
 
-    if cv.waitKey(15) & 0xFF == ord('q'):
+    if cv.waitKey(5) & 0xFF == ord('q'):
         break
 
 
