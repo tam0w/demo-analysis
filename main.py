@@ -5,7 +5,7 @@ youtube_url = input('Enter the video url: \n')
 # https://www.youtube.com/watch?v=30kOuEWrwro
 
 ydl_opts = {
-    'format': 'bestvideo[height=720]',
+    'format': 'bestvideo[height=720][fps<=?30]',
     'quiet': True
 }
 
@@ -14,7 +14,7 @@ newroundlist = []
 
 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
     info_dict = ydl.extract_info(youtube_url, download=False)
-    # pprint.pprint(info_dict)
+    pprint.pprint(info_dict)
     video_url = info_dict['url']
     print(video_url)
 
@@ -28,7 +28,8 @@ frame_count = 0
 buy = cv.imread(r'images\buy.png')
 defe = cv.imread(r'images\defeat.png')
 frame_no = 0
-roundstartframe = 41
+round_counter = 0
+timer = 0
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -37,19 +38,18 @@ while cap.isOpened():
         break
 
     if frame_count % frame_interval == 0:
-        temp = cv.matchTemplate(frame, buy, cv.TM_COEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv.MinMaxLoc(temp)
-        if max_val > 0.6:
+        temp = cv.matchTemplate(frame, buy, cv.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv.minMaxLoc(temp)
+        print(max_val)
+        if max_val > 0.4:
+            print('found')
+            round_counter =+ 1
+            timer = 25
 
-            frame_no =+ 1
-        elif max_val < 0.6 & 0 < frame_no < 40:
-            frame_no =+ 1
-        else:
-            frame_no = 0
-            defeat = cv.matchTemplate(frame, defe, cv.TM_COEFF_NORMED)
-            min_val, def_val, min_loc, def_loc = cv.MinMaxLoc(defeat)
-            if def_val < 0.7:
-                cv.imshow('Video', frame)
+        defeat = cv.matchTemplate(frame, defe, cv.TM_CCOEFF_NORMED)
+        min_val, def_val, min_loc, def_loc = cv.minMaxLoc(defeat)
+        if def_val < 0.7:
+            print(frame_count)
 
         # reader = easyocr.Reader(['en'])  # this needs to run only once to load the model into memory
         # result = reader.readtext(frame)
@@ -58,10 +58,10 @@ while cap.isOpened():
 
     if cv.waitKey(5) & 0xFF == ord('q'):
         break
-
+    timer =- 1
     frame_count += 1
 
-
+print(max_val,def_val,frame_count)
 cap.release()
 cv.destroyAllWindows()
 
